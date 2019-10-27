@@ -7,7 +7,7 @@ output:
   toc: true
 vignette: >
   %\VignetteIndexEntry{Basics: Introduction to Cardinal}
-  %\VignetteKeyword{ExperimentData, MassSpectrometryData, ImagingMassSpectrometry}
+  %\VignetteKeyword{ExperimentData, MassSpectrometryData, ImagingMassSpectrometry, Visualization}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

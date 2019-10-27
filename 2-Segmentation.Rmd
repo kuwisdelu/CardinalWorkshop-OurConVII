@@ -17,7 +17,7 @@ BiocStyle::markdown()
 ```
 
 ```{r setup, echo=FALSE, message=FALSE}
-library(Cardinal)
+library(CardinalWorkflows)
 register(SerialParam())
 options(Cardinal.verbose=FALSE)
 options(Cardinal.progress=FALSE)
@@ -26,7 +26,7 @@ RNGkind("L'Ecuyer-CMRG")
 
 # Introduction 
 
-# Analysis of a pig fetus wholy body cross section
+# Segmentation of a pig fetus wholy body cross section
 
 ## Pre-processing
 
@@ -48,7 +48,7 @@ RNGkind("L'Ecuyer-CMRG")
 
 ### Interpretting the segmentation
 
-# Analysis of a painting
+# Segmentation of a cardinal painting
 
 ## Pre-processing
 

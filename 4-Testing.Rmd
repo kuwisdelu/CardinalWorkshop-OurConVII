@@ -1,0 +1,60 @@
+---
+title: "Class comparison for MSI experiments with Cardinal"
+author: "Kylie Ariel Bemis"
+date: "Revised: October 27, 2019"
+output:
+  BiocStyle::html_document:
+  toc: true
+vignette: >
+  %\VignetteIndexEntry{Class comparision: Statistical testing workflow}
+  %\VignetteKeyword{ExperimentData, MassSpectrometryData, ImagingMassSpectrometry, Regression}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+  
+  ```{r style, echo=FALSE, results='asis'}
+BiocStyle::markdown()
+```
+
+```{r setup, echo=FALSE, message=FALSE}
+library(CardinalWorkflows)
+register(SerialParam())
+options(Cardinal.verbose=FALSE)
+options(Cardinal.progress=FALSE)
+RNGkind("L'Ecuyer-CMRG")
+```
+
+# Introduction 
+
+# Statistical testing for a renal cell carcinoma (RCC) cancer dataset
+
+## Pre-processing
+
+### Non-specific filtering to reduce data size
+
+### Segmentation with spatial Dirichlet Gaussian mixture model (DGMM)
+
+## Visualization
+
+## Class comparison with means-based testing
+
+### Fitting models with means-summarized groups
+
+### Interpreting the results
+
+## Class comparison with segmentation-based testing
+
+### Fitting models with spatial-DGMM-summarized groups
+
+### Interpreting the results
+
+# Additional uses for spatial DGMM segmentations
+
+# Session information
+
+```{r session-info}
+sessionInfo()
+```
+
+
+
