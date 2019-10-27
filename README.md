@@ -35,7 +35,7 @@ This will install *BiocManager*, an R package for installing and managing packag
 
 ## Installing Cardinal
 
-After installing *BiocManager*:
+After installing *BiocManager*, run the following R code:
 
 ```{r}
 BiocManager::install(c("Cardinal",  "CardinalWorkflows"), version="3.10")
