@@ -1,0 +1,81 @@
+---
+title: "Introduction to Cardinal"
+author: "Kylie Ariel Bemis"
+date: "Revised: October 27, 2019"
+output:
+  BiocStyle::html_document:
+  toc: true
+vignette: >
+  %\VignetteIndexEntry{Basics: Introduction to Cardinal}
+  %\VignetteKeyword{ExperimentData, MassSpectrometryData, ImagingMassSpectrometry}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r style, echo=FALSE, results='asis'}
+BiocStyle::markdown()
+```
+
+```{r setup, echo=FALSE, message=FALSE}
+library(Cardinal)
+register(SerialParam())
+options(Cardinal.verbose=FALSE)
+options(Cardinal.progress=FALSE)
+RNGkind("L'Ecuyer-CMRG")
+```
+
+# Introduction 
+
+# Importing MS imaging data from imzML
+
+## "Continuous" versus "Processed" imzML
+
+## Tips and tricks
+
+# Components of an `MSImagingExperiment`
+
+## Pixel metadata
+
+## Feature metadata
+
+## Accessing spectra data
+
+## Subsetting and combining MSI datasets
+
+## Tips and tricks
+
+
+# Visualization
+
+## Plotting mass spectra
+
+## Plotting ion images
+
+## Region-of-interest selection
+
+## Saving plots and images
+
+## Plotting options
+
+
+# Manipulation and summarization
+
+## Transforming and filtering data
+
+## Summarizing an MSI dataset
+
+
+# Useful R functions to know
+
+
+# Constructing an `MSImagingExperiment` from scrach
+
+
+# Session information
+
+```{r session-info}
+sessionInfo()
+```
+
+
+

@@ -1,0 +1,67 @@
+---
+title: "Segmentation of MSI experiments with Cardinal"
+author: "Kylie Ariel Bemis"
+date: "Revised: October 27, 2019"
+output:
+  BiocStyle::html_document:
+  toc: true
+vignette: >
+  %\VignetteIndexEntry{Segmentation: Unsupervised analysis workflow}
+  %\VignetteKeyword{ExperimentData, MassSpectrometryData, ImagingMassSpectrometry, Clustering}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r style, echo=FALSE, results='asis'}
+BiocStyle::markdown()
+```
+
+```{r setup, echo=FALSE, message=FALSE}
+library(Cardinal)
+register(SerialParam())
+options(Cardinal.verbose=FALSE)
+options(Cardinal.progress=FALSE)
+RNGkind("L'Ecuyer-CMRG")
+```
+
+# Introduction 
+
+# Analysis of a pig fetus wholy body cross section
+
+## Pre-processing
+
+## Visualization
+
+### Ion images
+
+### Prinipal components analysis (PCA)
+
+## Segmentation with spatial shrunken centroids (SSC)
+
+### Plotting the segmentation
+
+### Plotting the (shrunken) mean spectra
+
+### Plotting and interpretting t-statistics of the *m/z* values
+
+### Selecting a segmentation
+
+### Interpretting the segmentation
+
+# Analysis of a painting
+
+## Pre-processing
+
+## Visualization
+
+## Segmetation with SSC
+
+
+# Session information
+
+```{r session-info}
+sessionInfo()
+```
+
+
+

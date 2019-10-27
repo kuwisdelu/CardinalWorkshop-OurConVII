@@ -1,0 +1,59 @@
+---
+title: "Classification of MSI experiments with Cardinal"
+author: "Kylie Ariel Bemis"
+date: "Revised: October 27, 2019"
+output:
+  BiocStyle::html_document:
+  toc: true
+vignette: >
+  %\VignetteIndexEntry{Classification: Supervised analysis workflow}
+  %\VignetteKeyword{ExperimentData, MassSpectrometryData, ImagingMassSpectrometry, Classification}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+  
+  ```{r style, echo=FALSE, results='asis'}
+BiocStyle::markdown()
+```
+
+```{r setup, echo=FALSE, message=FALSE}
+library(Cardinal)
+register(SerialParam())
+options(Cardinal.verbose=FALSE)
+options(Cardinal.progress=FALSE)
+RNGkind("L'Ecuyer-CMRG")
+```
+
+# Introduction 
+
+# Analysis of a renal cell carcinoma (RCC) cancer dataset
+
+## Pre-processing
+
+## Visualization
+
+### Ion images
+
+### Prinipal components analysis (PCA)
+
+## Classification with spatial shrunken centroids (SSC)
+
+### Cross-validation with SSC
+
+### Plotting the classified images
+
+### Plotting the (shrunken) mean spectra
+
+### Plotting and interpretting t-statistics of the *m/z* values
+
+# Additional notes on cross-validation
+
+
+# Session information
+
+```{r session-info}
+sessionInfo()
+```
+
+
+
