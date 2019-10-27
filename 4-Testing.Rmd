@@ -25,11 +25,25 @@ RNGkind("L'Ecuyer-CMRG")
 ```
 
 # Introduction 
+The renal cell carcinoma (RCC) cancer dataset consisting of 8 matched pairs of human kidney tissue. Each tissue pair consists of a normal tissue sample and a cancerous tissue sample. The histological images of these samples are shown in below:
+
+```{r}
+library("imager")
+files <- list.files(path = "img", pattern = "^[r]", full.names=TRUE)
+all_im <- lapply(files, load.image )
+par(mfrow=c(2,4))
+for (i in 1:8)
+{
+  plot(all_im[[i]])
+}
+```
 
 # Statistical testing for a renal cell carcinoma (RCC) cancer dataset
 
+Statistical testing is performed to find m/z features differentially abundant among different groups. For the RCC cancer dataset, the goal is to find m/z features differentially abundant between normal and cancer tissue so that we can better understand the chemical signature of RCC.
 ## Pre-processing
 
+Before fitting any statistical model, pre-processing is necessary to remove noise, unwanted peaks and data variance.The pre-processing steps are shown below:
 ```{r}
 data(rcc)
 rcc<-as(rcc,"MSImagingExperiment")
@@ -50,7 +64,11 @@ rcc.peaks<-rcc%>%
   peakBin(mz(rcc.processed)) %>%
   process()
 
+```
 
+After pre-processing, we can check the number of remaining peaks and visualize ion images of interest.
+
+```{r}
 ###########check dimension
 dim(rcc.peaks)
 
@@ -58,7 +76,7 @@ dim(rcc.peaks)
 image(rcc.peaks,mz=810)
 ```
 
-
+The following code is to split the sample into two parts - cancer and normal and label each pixel using variable "diagnosis":
 ```{r}
 
 cutoff<-c(35,23,28,39,29,28,44,32)
@@ -86,28 +104,40 @@ image(rcc.peaks, diagnosis~x*y, layout=c(2,4))
 ```
 
 ### Segmentation with spatial Dirichlet Gaussian mixture model (DGMM)
-
+Spatial-DGMM detects ion-specific tissue components with homogeneous spatial composition. It can estimate the number of Gaussian components and the mean and variance of each Gaussian component. It analyzes one m/z feature, one sample at a time.For example, we can visualize ion image of the 86th m/z feature for cancer tissue of the last sample:
 ```{r}
 f<-86
 rcc.sub<-rcc.peaks[,run(rcc.peaks)==unique(run(rcc.peaks))[16]]
+image(rcc.sub, feature=f, main=paste0("m/z=", mz(rcc.sub)[f]))
+      
+```
 
+Then we fit spatial-DGMM on this single ion image:
+
+```{r}
 dgmm<-spatialDGMM(rcc.sub[f,],r=1,k=4)
+
+summary(dgmm)
 
 image(dgmm)
 ```
+
 
 ## Visualization
 
 ## Class comparison with means-based testing
 
+
+### Fitting models with means-summarized groups
+
 ```{r}
+rcc.peaks.subset<-rcc.peaks[1:8,]
+mtest <- meansTest(rcc.peaks.subset, ~ diagnosis, groups=run(rcc.peaks.subset))
 
-
-
+summary(mtest)
 
 ```
 
-### Fitting models with means-summarized groups
 
 ### Interpreting the results
 
