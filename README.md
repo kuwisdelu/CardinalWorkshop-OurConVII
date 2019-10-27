@@ -18,7 +18,7 @@ This may require you to re-install packages you already have, and may lead to sm
 
 Download and install R >= 3.6.1 for your platform from CRAN: https://cran.r-project.org
 
-We recommend (but do not require) the use of RStudio, which provides a nice integrated development environment for working with R.
+We recommend (but do not require) the use of RStudio, which provides a nicer environment for working with R.
 
 You can download and install (the free version of) RStudio here: https://rstudio.com/products/rstudio/download
 
@@ -42,6 +42,10 @@ BiocManager::install(c("Cardinal",  "CardinalWorkflows"), version="3.10")
 ```
 
 This will install *Cardinal* from Bioconductor version 3.10. (After the official release of Bioconductor 3.10, you may omit the `version` argument.)
+
+# Course material
+
+The teaching material for the workshop is provided here in R markdown (.Rmd) format, which allows interleaving of R code with text markup to generate the provided HTML documents. This allows you to reproduce the analysis by re-running the same R code used in the workshop. If you are using RStudio, you can generate the final document by opening the R markdown file and clicking the "Knit" button.
 
 # Schedule
 
