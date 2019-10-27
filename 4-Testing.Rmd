@@ -27,7 +27,7 @@ RNGkind("L'Ecuyer-CMRG")
 # Introduction 
 The renal cell carcinoma (RCC) cancer dataset consisting of 8 matched pairs of human kidney tissue. Each tissue pair consists of a normal tissue sample and a cancerous tissue sample. The histological images of these samples are shown in below:
 
-```{r}
+```{r,warning=F}
 library("imager")
 files <- list.files(path = "img", pattern = "^[r]", full.names=TRUE)
 all_im <- lapply(files, load.image )
@@ -44,7 +44,7 @@ Statistical testing is performed to find m/z features differentially abundant am
 ## Pre-processing
 
 Before fitting any statistical model, pre-processing is necessary to remove noise, unwanted peaks and data variance.The pre-processing steps are shown below:
-```{r}
+```{r, warning=F}
 data(rcc)
 rcc<-as(rcc,"MSImagingExperiment")
 
@@ -126,35 +126,60 @@ image(dgmm)
 ## Visualization
 
 ## Class comparison with means-based testing
-
+AS introduced earlier, statistical testing is performed to find m/z features differentially abundant among different groups. Since we have an "image" for each m/z feature and each sample, we can not compare the "image" directly. One way to summarize the image is to simply calculate the mean value across each image.Then the mean values are put into statistical models, such as simple linear model, linear mixed model.
 
 ### Fitting models with means-summarized groups
-
+In Cardinal, we can simply use "mtest" to do means-based testing in a MSI experiment. "mtest" takes an MSImageExperiment object as input. The fixed effects are specified after "~" (diagnosis in this particular data). The groups indicating the observational units must be provided. Each group is summarized by its mean, and then a linear model is fit to the summaries.
 ```{r}
 rcc.peaks.subset<-rcc.peaks[1:8,]
 mtest <- meansTest(rcc.peaks.subset, ~ diagnosis, groups=run(rcc.peaks.subset))
 
-summary(mtest)
 
 ```
 
 
 ### Interpreting the results
+
+```{r}
+summary(mtest)
+topFeatures(mtest, p.adjust="fdr", AdjP < .05)
+```
+
 
 ## Class comparison with segmentation-based testing
 
+Means-based testing is fast and simple and can work well for homogeneous samples, while it loses the spatial information of each m/z features and does not take the advantage of MS imaging. Other than averaging ion intensity, using segmentation summarization provided by spatial-DGMM is a way to keep spatial heterogeneous information.
+
+
 ### Fitting models with spatial-DGMM-summarized groups
+First, we must segment the data with spatialDGMM(), while making sure that each observational unit is segmented within a different group (as specified by groups).
 ```{r}
-dgmm2<-spatialDGMM(rcc.peaks[2:5,],r=1,k=4,groups=run(rcc.peaks))
+dgmm2<-spatialDGMM(rcc.peaks[1:8,],r=1,k=4,groups=run(rcc.peaks))
+summary(dgmm2)
+image(dgmm2, model=list(feature=2))
+```
 
-stest<-segmentationTest(dgmm2, ~diagnosis, classControl = "Ymax")
+Now use segmentationTest() to fit the models.
 
-summary(stest)
+In order to fit the models, a representative spatial-DGMM segment must be selected for each group. There are two automated ways to do this via classControl: "Ymax" means use the segment with the highest mean, and "Mscore" means use the segment with the highest match score with the fixed effects.
+
+```{r}
+stest<-segmentationTest(dgmm2, ~diagnosis, classControl = "Mscore")
+
+
 ```
 
 ### Interpreting the results
 
+```{r}
+summary(stest)
+topFeatures(stest, p.adjust="fdr", AdjP < .05)
+```
+
+
 # Additional uses for spatial DGMM segmentations
+Check our publication: D. Guo, K. Bemis, C. Rawlins, J. Agar, O. Vitek. “Unsupervised segmentation of mass spectrometric ion images characterizes morphology of tissues”, In: Proceedings of International Society for Computational Biology (ISMB), 35:i208, 2019. https://academic.oup.com/bioinformatics/article/35/14/i208/5529219
+
 
 # Session information
 
