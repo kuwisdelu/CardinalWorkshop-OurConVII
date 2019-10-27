@@ -6,6 +6,10 @@ Updated: Sunday, October 27, 2019
 
 The workshop focuses on computational and statistical analysis of mass spectrometry-based experiments, using open-source R-based software Cardinal (http://cardinalmsi.org) The workshop is designed for scientists who work with DESI- or MALDI-based experiments, and who are comfortable with basics of R. The program includes an introductory lecture describing Cardinal and statistical analysis of MSI experiments, and a hands-on session discussing workflows for clustering, classification, and class comparison.
 
+# Course material
+
+The teaching material for the workshop is provided here in R markdown (.Rmd) format, which allows interleaving of R code with text markup to generate the provided HTML documents. This allows you to reproduce the analysis by re-running the same R code used in the workshop. If you are using RStudio, you can generate the final document by opening the R markdown file and clicking the "Knit" button.
+
 # Installation instructions
 
 This workshop will use __R >= 3.6.1__ and __Bioconductor >= 3.10__.
@@ -42,10 +46,6 @@ BiocManager::install(c("Cardinal",  "CardinalWorkflows"), version="3.10")
 ```
 
 This will install *Cardinal* from Bioconductor version 3.10. (After the official release of Bioconductor 3.10, you may omit the `version` argument.)
-
-# Course material
-
-The teaching material for the workshop is provided here in R markdown (.Rmd) format, which allows interleaving of R code with text markup to generate the provided HTML documents. This allows you to reproduce the analysis by re-running the same R code used in the workshop. If you are using RStudio, you can generate the final document by opening the R markdown file and clicking the "Knit" button.
 
 # Schedule
 
