@@ -53,13 +53,11 @@ This will install *Cardinal* from Bioconductor version 3.10. (After the official
 
 10:30 - 10:45 Break / practice
 
-10:45 - 11:00 Lecture: Supervised and unsupervised analysis
+10:45 - 11:45 Hands-on: Classification and segmentation in Cardinal
 
-11:30 - 12:00 Hands-on: Classification and segmentation in Cardinal
+11:45 - 12:00 Break / practice
 
-12:00 - 12:15 Lecture: Class comparison
-
-12:15 - 12:45 Hands-on: Statistical testing in Cardinal
+12:00 - 12:45 Hands-on: Statistical testing in Cardinal
 
 12:45 - 13:00 Wrap-up
 
