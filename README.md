@@ -8,7 +8,7 @@ The workshop focuses on computational and statistical analysis of mass spectrome
 
 # Course material
 
-The teaching material for the workshop is provided here in R markdown (.Rmd) format, which allows interleaving of R code with text markup to generate the provided HTML documents. This allows you to reproduce the analysis by re-running the same R code used in the workshop. If you are using RStudio, you can generate the final document by opening the R markdown file and clicking the "Knit" button.
+The teaching material for the workshop is provided here in R markdown (.Rmd) format, which allows interleaving of R code with text markup to generate the provided HTML documents. This allows you to reproduce the analysis by re-running the same R code used in the workshop. If you are using RStudio, you can generate the final document by opening the R markdown file and clicking the "Knit" button (it may take a while to re-run all of the R code).
 
 # Installation instructions
 
