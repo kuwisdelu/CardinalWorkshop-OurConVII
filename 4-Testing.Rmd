@@ -30,13 +30,82 @@ RNGkind("L'Ecuyer-CMRG")
 
 ## Pre-processing
 
+```{r}
+data(rcc)
+rcc<-as(rcc,"MSImagingExperiment")
+
+rcc$sample<-run(rcc)
+##############preprocess
+rcc.processed<-rcc %>%
+  normalize(method="tic")%>%
+  #reduceBaseline()%>%
+  peakPick(method = "simple", SNR=10)%>%
+  peakAlign()%>%
+  peakFilter()%>%
+  process()
+
+rcc.peaks<-rcc%>%
+  normalize(method="tic")%>%
+  #reduceBaseline()%>%
+  peakBin(mz(rcc.processed)) %>%
+  process()
+
+
+###########check dimension
+dim(rcc.peaks)
+
+#####visualize
+image(rcc.peaks,mz=810)
+```
+
+
+```{r}
+
+cutoff<-c(35,23,28,39,29,28,44,32)
+rcc.peaks$diagnosis<-"normal"
+for (i in 1:length(unique(run(rcc.peaks))))
+{
+  rcc.peaks$diagnosis[(run(rcc.peaks)==unique(run(rcc.peaks))[i])&(coord(rcc.peaks)$x<cutoff[i])]<-"cancer"
+  
+}
+
+run(rcc.peaks)<-as.factor(paste0(rcc.peaks$sample,'-', rcc.peaks$diagnosis))
+####visualize
+
+image(rcc.peaks, diagnosis~x*y, layout=c(2,4))
+
+```
+
+
 ### Non-specific filtering to reduce data size
 
+```{r}
+#rcc.peaks<-rcc.peaks[78:86,]
+
+
+```
+
 ### Segmentation with spatial Dirichlet Gaussian mixture model (DGMM)
+
+```{r}
+f<-86
+rcc.sub<-rcc.peaks[,run(rcc.peaks)==unique(run(rcc.peaks))[16]]
+
+dgmm<-spatialDGMM(rcc.sub[f,],r=1,k=4)
+
+image(dgmm)
+```
 
 ## Visualization
 
 ## Class comparison with means-based testing
+
+```{r}
+
+
+
+
+```
 
 ### Fitting models with means-summarized groups
 
@@ -45,6 +114,13 @@ RNGkind("L'Ecuyer-CMRG")
 ## Class comparison with segmentation-based testing
 
 ### Fitting models with spatial-DGMM-summarized groups
+```{r}
+dgmm2<-spatialDGMM(rcc.peaks[2:5,],r=1,k=4,groups=run(rcc.peaks))
+
+stest<-segmentationTest(dgmm2, ~diagnosis, classControl = "Ymax")
+
+summary(stest)
+```
 
 ### Interpreting the results
 
