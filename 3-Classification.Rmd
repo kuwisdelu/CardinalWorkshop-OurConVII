@@ -1,5 +1,5 @@
 ---
-title: "Classification of MSI experiments with Cardinal"
+title: "Classification of MS imaging experiments with Cardinal"
 author: "Kylie Ariel Bemis"
 date: "Revised: October 27, 2019"
 output:
