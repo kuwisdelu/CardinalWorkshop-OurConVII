@@ -1,6 +1,6 @@
 ---
 title: "Class comparison for MSI experiments with Cardinal"
-author: "Kylie Ariel Bemis"
+author: "Dan Guo"
 date: "Revised: October 27, 2019"
 output:
   BiocStyle::html_document:
@@ -25,22 +25,35 @@ RNGkind("L'Ecuyer-CMRG")
 ```
 
 # Introduction 
-The renal cell carcinoma (RCC) cancer dataset consisting of 8 matched pairs of human kidney tissue. Each tissue pair consists of a normal tissue sample and a cancerous tissue sample. The histological images of these samples are shown in below:
 
-```{r,warning=F}
-library("imager")
-files <- list.files(path = "img", pattern = "^[r]", full.names=TRUE)
-all_im <- lapply(files, load.image )
-par(mfrow=c(2,4))
-for (i in 1:8)
-{
-  plot(all_im[[i]])
-}
+For experiments in which analyzed samples come from different classes or conditions, a common goal of statistical analysis is class comparison via hypothesis testing.
+
+Statistical testing is performed to find peaks that are differentially abundant among different classes or conditions.
+
+Valid statistical testing requires biological replicates in order to compare between different conditions. It should never be performed with less than 3 samples per condition.
+
+In this vignette, we present an example class comparison workflow using *Cardinal*.
+
+We begin by loading the package:
+
+```{r}
+library(Cardinal)
 ```
 
 # Statistical testing for a renal cell carcinoma (RCC) cancer dataset
 
-Statistical testing is performed to find m/z features differentially abundant among different groups. For the RCC cancer dataset, the goal is to find m/z features differentially abundant between normal and cancer tissue so that we can better understand the chemical signature of RCC.
+This example uses DESI spectra collected from a renal cell carcinoma (RCC) cancer dataset consisting of 8 matched pairs of human kidney tissue. Each tissue pair consists of a normal tissue sample and a cancerous tissue sample. The goal of the workflow is to develop classifiers for predicting whether a new tissue sample is normal or cancer.
+
+MH0204_33 | UH0505_12 | UH0710_33 | UH9610_15
+--------- | --------- | --------- | ---------
+![](img/rcc-MH0204_33.png) | ![](img/rcc-UH0505_12.png) | ![](img/rcc-UH0710_33.png) | ![](img/rcc-UH9610_15.png)
+
+UH9812_03 | UH9905_18 | UH9911_05 | UH9912_01
+--------- | --------- | --------- | ---------
+![](img/rcc-UH9812_03.png) | ![](img/rcc-UH9905_18.png) | ![](img/rcc-UH9911_05.png) | ![](img/rcc-UH9912_01.png)
+
+For the RCC cancer dataset, the goal is to find m/z features differentially abundant between normal and cancer tissue.
+
 ## Pre-processing
 
 Before fitting any statistical model, pre-processing is necessary to remove noise, unwanted peaks and data variance.The pre-processing steps are shown below:
@@ -178,7 +191,10 @@ topFeatures(stest, p.adjust="fdr", AdjP < .05)
 
 
 # Additional uses for spatial DGMM segmentations
-Check our publication: D. Guo, K. Bemis, C. Rawlins, J. Agar, O. Vitek. “Unsupervised segmentation of mass spectrometric ion images characterizes morphology of tissues”, In: Proceedings of International Society for Computational Biology (ISMB), 35:i208, 2019. https://academic.oup.com/bioinformatics/article/35/14/i208/5529219
+
+For additional uses of spatial-DGMM, check our most recent paper:
+
+D. Guo, K. Bemis, C. Rawlins, J. Agar, O. Vitek. “Unsupervised segmentation of mass spectrometric ion images characterizes morphology of tissues”, In: Proceedings of International Society for Computational Biology (ISMB), 35:i208, 2019. https://academic.oup.com/bioinformatics/article/35/14/i208/5529219
 
 
 # Session information

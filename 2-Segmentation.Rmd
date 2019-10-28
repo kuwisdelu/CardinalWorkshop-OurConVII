@@ -152,13 +152,13 @@ Rather than manually going the full dataset and hand-selecting peaks, the goal o
 
 Principal component analysis (PCA) is a popular method for exploring a dataset. PCA is available in *Cardinal* through the `PCA()` method.
 
-Below, we calcualte the first 3 principal components.
+Below, we calculate the first 3 principal components.
 
 ```{r}
 pig206_pca <- PCA(pig206_peaks, ncomp=3)
 ```
 
-Next, we overlay the first three principal components.
+Next, we overlay the first 3 principal components.
 
 The overlay requires some contrast enhancement to see the structures clearly. In addition, the range of the PC scores are normalized to the same range (between 0 and 1).
 
@@ -249,9 +249,9 @@ Some differences are visible, but it can be difficult to tell exactly which peak
 
 Plotting the t-statistics tells us exactly the relationship between each segment's centroid and the global mean spectrum. The t-statistics are the difference between a segment's centroid and the global mean, divided by a standard error.
 
-Positive t-statistics indicate that *peak is *m/z* value is systematically higher in that segment as compared to the global mean spectrum.
+Positive t-statistics indicate that peak is systematically higher in that segment as compared to the global mean spectrum.
 
-Negative t-statistics indicate that *peak is *m/z* value is systematically lower in that segment as compared to the global mean spectrum.
+Negative t-statistics indicate that peak is systematically lower in that segment as compared to the global mean spectrum.
 
 Spatial shrunken centroids works by shrinking these t-statistics toward 0 by `s`, and using the new t-statistics to recompute the segment centroids. The effect is that peaks that are not very different between a specific segment and the global mean are effectively eliminated from the segmentation.
 

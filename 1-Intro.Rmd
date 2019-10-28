@@ -26,49 +26,354 @@ RNGkind("L'Ecuyer-CMRG")
 
 # Introduction 
 
+*Cardinal* can be installed via the *BiocManager* package.
+
+```{r install, eval=FALSE}
+install.packages("BiocManager")
+BiocManager::install("Cardinal")
+```
+
+The same function can be used to update *Cardinal* and other Bioconductor packages.
+
+Once installed, *Cardinal* can be loaded with `library()`:
+
+```{r library, eval=FALSE}
+library(Cardinal)
+```
+
+> Note that *Cardinal 2* uses parallel execution using the registered *BiocParallel* backend by default. This may not be appropriate for all situations. If you run into problems, try using `register(SerialParam())` to run code serially instead.
+
+```{r bpparam, eval=FALSE}
+register(SerialParam())
+```
+
+
 # Importing MS imaging data from imzML
 
-## "Continuous" versus "Processed" imzML
+To import an MS imaging dataset (e.g., from an imzML file), we use the `readMSIData()` function.
 
-## Tips and tricks
+First, let's download an example imzML file from the imzML.org website:
+
+```{r download}
+url <- "https://ms-imaging.org/wp/wp-content/uploads/2019/03/S043_Processed_imzML1.1.1.zip"
+tmpfile <- tempfile()
+tmpdir <- tempdir()
+download.file(url, destfile=tmpfile)
+```
+
+Now we unzip the file and get the file path. Most of this would typically done using your browser and operating system's file manager, but here we do it all through R.
+
+```{r unzip}
+unzip(tmpfile, exdir=tmpdir)
+file <- grep(".imzML", list.files(tmpdir), value=TRUE)
+file <- file.path(tmpdir, file)
+file
+```
+
+Now we use `readMSIData()` to import the dataset and assign it to a variable name.
+
+The first argument to the function is the path to the file. Additional arguments include:
+
+- `mass.range` If you know the mass range ahead of time, this can speed up import time, as it doesn't have to be read from the data
+
+- `resolution` For "processed" imzML, this is the default bin width to use for the mass spectra
+
+- `units` The units of the `resolution` argument: either "ppm" or "mz"
+
+```{r load}
+mse <- readMSIData(file, resolution=0.05, units="mz")
+mse
+```
+
 
 # Components of an `MSImagingExperiment`
 
-## Pixel metadata
+In *Cardinal*, MS imaging experiment datasets are composed of multiple sets of metadata, in addition to the actual spectral intensities. These are (1) pixel metadata, (2) feature ($m/z$) metadata, (3) the actual imaging data, and (4) a class that holds all of these and represents the experiment as a whole.
 
-## Feature metadata
+`MSImagingExperiment` is a matrix-like container for complete MS imaging experiments, where the "rows" represent the mass features, and the columns represent the pixels. An `MSImagingExperiment` object contains the following components:
 
-## Accessing spectra data
+- `pixelData()` accesses the pixel information, stored in a `PositionDataFrame`
 
-## Subsetting and combining MSI datasets
+- `featureData()` accesses the feature information, stored in `MassDataFrame`
 
-## Tips and tricks
+- `spectraData()` accesses the spectral information, stored in a `ImageArrayList`
+
+Unlike many software packages designed for analysis of MS imaging experiments, *Cardinal* is designed to work with multiple datasets simultaneously and can integrate all aspects of experimental design and metadata.
+
+## Pixel metadata with `PositionDataFrame`
+
+The `pixelData()` accessor extracts the pixel information for an `MSImagingExperiment`. The pixel data are stored in a `PositionDataFrame` object, which is a type of data frame that separately tracks pixel coordinates and experimental run information.
+
+```{r pixel-data}
+pixelData(mse)
+```
+
+The `coord()` accessor specifically extracts the data frame of pixel coordinates.
+
+```{r coord-access}
+coord(mse)
+```
+
+Individual columns of a data frame can be accessed via the `$` accessor.
+
+```{r coord-access-dollarsign}
+coord(mse)$x[1:10]
+coord(mse)$y[1:10]
+```
+
+The `run()` accessor specifically extracts the vector of experimental runs.
+
+```{r run-access}
+run(mse)[1:10]
+```
+
+## Feature metadata with `MassDataFrame`
+
+The `featureData()` accessor extracts the feature information for an `MSImagingExperiment`. The feature data are stored in a `MassDataFrame` object, which is a type of data frame that separately tracks the *m/z*-values associated with the mass spectral features.
+
+```{r feature-data}
+featureData(mse)
+```
+
+The `mz()` accessor specifically extracts the vector of *m/z*-values.
+
+```{r mz-access}
+mz(mse)[1:10]
+```
+
+## Accessing spectra and image data
+
+The `spectraData()` accessor extracts the spectra/image data for an `MSImagingExperiment`. The data are stored in an `ImageArrayList`, which is a list of matrix-like objects.
+
+It is possible to store multiple matrices of intensities in this list. Typically, only the first entry will be used by pre-processing and analysis methods.
+
+```{r image-data}
+spectraData(mse)
+```
+
+The `spectra()` accessor is a shortcut for accessing the first data matrix.
+
+```{r spectra-access}
+spectra(mse)
+```
+
+Rows of these matrices correspond to mass features. Columns correspond to pixels. In other words, each column is a mass spectrum, and each row is a flattened vector of images.
+
+## "Continuous" versus "Processed" imzML
+
+In order to specialize to the needs of different datasets, *Cardinal* provides specialized versions of `MSImagingExperiment` that reflect different spectra storage strategies.
+
+These actually correspond to the different imzML formats.
+
+The dataset we imported was "processed" imzML.
+
+`MSProcessedImagingExperiment` is a specialization that enforces the data matrices be stored as sparse, column-major matrices.
+
+In this format, each mass spectrum has a __different__ list of *m/z* values. However, *Cardinal* will bin the data on-the-fly so the intensities can always be accessed as a matrix. Accessing rows (images) is often slow compared to columns (spectra).
+
+```{r show}
+mse
+spectraData(mse)
+```
+
+`MSContinuousImagingExperiment` is a specialization that enforces the data matrices be stored as dense, column-major matrices.
+
+In this format, each mass spectrum has the __same__ list of *m/z* values. Therefore, it is straightforward to store the intensities as a dense matrix. Accessing rows (images) and accessing columns (spectra) are both fast.
+
+```{r continuous}
+mse2 <- as(mse, "MSContinuousImagingExperiment")
+mse2
+spectraData(mse2)
+```
+
+Because `MSProcessedImagingExperiment` objects are binned on-the-fly to the *m/z*-values specified by `mz()`, it is useful to know the binning resolution.
+
+```{r res-get}
+resolution(mse)
+```
+
+It's possible to change this binning resolution at any time. 
+
+```{r res-set}
+resolution(mse) <- c(ppm=100)
+```
+
+Changing the binned mass resolution will typically change the effective dimensions of the experiment. The effective *m/z*-values for the experiment are also updated to reflect the new bins.
+
+Note that the underlying data will remain unchanged, but the binned values for the intensities will be different.
+
+
+## Collect data into memory
+
+By default, *Cardinal* does not load the spectra from imzML and Analyze files into memory, but retrieves them from files when necessary.
+
+For very large datasets, this is necessary and memory-efficient.
+
+However, for datasets that are known to fit in computer memory, this may be unnecessarily slow, especially when plotting images (which are perpendicular to how data are stored in the files).
+
+If loading the data fully into memory is desired, either set `attach.only=FALSE` when reading the data with `readMSIData()`, or use `collect()` to pull all `spectraData()` elements of an `MSImagingExperiment` into memory.
+
+```{r collect}
+mse <- collect(mse)
+spectra(mse)
+```
+
+
+
+## Subsetting MSI datasets
+
+An entire `MSImagingExperiment` object can be subset like a matrix, where the columns are the mass spectra, and the rows are the *m/z* values.
+
+```{r subset-rows}
+mse[1:5,]
+```
+
+```{r subset-cols}
+mse[,1:5]
+```
+
+The `select()` and `filter()`  methods are another useful way of expressing subsetting.
+
+Use `select()` to subset the pixels.
+
+```{r select}
+select(mse, y < 100)
+```
+
+Use `filter()` to subset the *m/z* values.
+
+```{r filter}
+filter(mse, mz > 150)
+```
+
+## Combining MSI datasets
+
+It is possible to combine multiple datasets as long as the *m/z* values match.
+
+This is typically necessary for experiments, which often consist of multiple runs.
+
+```{r shallow-copy}
+mse3 <- mse
+runNames(mse3) <- "New_Run"
+```
+
+```{r combine}
+mse4 <- combine(mse, mse3)
+mse4
+```
+
+The easiest way to combine `MSProcessedImagingExperiment` objects is to import them with the same mass range and resolution. However, `MSContinuousImagingExperiment` objects may require manual re-binning with `mzBin()` if they do not share the same *m/z* values.
 
 
 # Visualization
 
+Visualization of mass spectra and molecular ion images is vital for exploratory analysis of MS imaging experiments. *Cardinal* provides a `plot()` method for plotting mass spectra and an `image()` method for plotting ion images.
+
 ## Plotting mass spectra
+
+Use `plot()` to plot mass spectra. Either `pixel` or `coord` can be specified to determine which mass spectra should be plotted.
+
+```{r plot}
+plot(mse, coord=list(x=50, y=50))
+```
 
 ## Plotting ion images
 
+Use `image()` to plot ion images. Either `feature` or `mz` can be specified to determine which mass features should be plotted.
+
+```{r image}
+image(mse, mz=157.2, plusminus=0.25)
+```
+
+Multiplicative variance in spectral intensities can cause images to be noisy and dark due to hot spots.
+
+Often, images may require some type of processing and enhancement to improve interpretation.
+
+```{r image-2}
+image(mse, mz=157.2, plusminus=0.25,
+      contrast.enhance="histogram",
+      smooth.image="gaussian")
+```
+
+Multiple images can be plotted at once for comparison.
+
+```{r image-3}
+image(mse, mz=c(157.2, 171.2), plusminus=0.25,
+      contrast.enhance="histogram",
+      smooth.image="gaussian",
+      normalize.image="linear")
+```
+
 ## Region-of-interest selection
+
+The `selectROI()` method can be used to select regions of interest.
+
+```{r select-roi, eval=FALSE}
+roi <- selectROI(mse, mz=157.2, plusminus=0.25)
+
+image(mse, roi ~ x * y)
+```
+
+Note that the way RStudio handles plots unfortimately makes it more difficult to do this than in the regular R GUI or when running R from a terminal.
 
 ## Saving plots and images
 
+Plots and images can be saved to a file by using R's built-in graphics devices.
+
+Use `pdf()` to initialize a PDF graphics device, create the plot, and then use `dev.off()` to turn off the graphics device.
+
+Any plots printed while the graphics device is active will be saved to the specified file(s).
+
+```{r pdf, eval=FALSE}
+pdf_file <- paste0(tempfile(), ".pdf")
+
+pdf(file=pdf_file, width=9, height=4)
+image(mse, mz=157.2, plusminus=0.25)
+dev.off()
+```
+
+Graphics devices for `png()`, `jpeg()`, `bmp()`, and `tiff()` are also available. See their documentation for usage.
+
 ## Plotting options
 
+While many software for MS imaging data use a light-on-dark theme, *Cardinal* uses a transparent background by default. However, a dark theme is also provided through `darkmode()`.
 
-# Manipulation and summarization
+```{r dark-mode}
+darkmode()
+image(mse, mz=157.2, plusminus=0.25)
+```
 
-## Transforming and filtering data
+Any future plots on the current device will use the new mode. The default mode can be restored to the current device with `lightmode()`.
 
-## Summarizing an MSI dataset
+```{r light-mode}
+lightmode()
+```
+
+The default for new plots can also be changed by setting `options(Cardinal.dark=TRUE)`. The current option can be checked with `getOption("Cardinal.dark")`.
 
 
-# Useful R functions to know
+# Summarization
 
+The `summarize()` function is useful for calculating useful summaries such as the mean spectrum or the TIC of the image.
 
-# Constructing an `MSImagingExperiment` from scrach
+Here, we calculate and plot the mean spectrum.
+
+```{r mean}
+mse_mean <- summarize(mse, .stat="mean")
+```
+
+```{r plot-mean}
+plot(mse_mean)
+```
+
+```{r tic}
+mse_tic <- summarize(mse, .stat=c(tic="sum"), .by="pixel")
+```
+
+```{r plot-tic}
+image(mse_tic)
+```
+
 
 
 # Session information
