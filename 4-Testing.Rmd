@@ -42,7 +42,7 @@ library(Cardinal)
 
 # Statistical testing for a renal cell carcinoma (RCC) cancer dataset
 
-This example uses DESI spectra collected from a renal cell carcinoma (RCC) cancer dataset consisting of 8 matched pairs of human kidney tissue. Each tissue pair consists of a normal tissue sample and a cancerous tissue sample. The goal of the workflow is to develop classifiers for predicting whether a new tissue sample is normal or cancer.
+This example uses DESI spectra collected from a renal cell carcinoma (RCC) cancer dataset consisting of 8 matched pairs of human kidney tissue. Each tissue pair consists of a normal tissue sample and a cancerous tissue sample.
 
 MH0204_33 | UH0505_12 | UH0710_33 | UH9610_15
 --------- | --------- | --------- | ---------
@@ -100,7 +100,7 @@ rcc_peaks <- rcc %>%
 rcc_peaks
 ```
 
-This produces a centroided dataset with 103 peaks.
+This produces a centroided dataset with 82 peaks.
 
 Rather than rely on the manual region-of-interest selection, we will rely on the fact that cancer tissue is on the left and the normal tissue is on the right on each slide.
 
@@ -148,6 +148,7 @@ Spatial-DGMM performs peak-specific segmentation. It detects peak-specific tissu
 This gives us a useful summary of the spatial distribution of each peak.
 
 ```{r dgmm1}
+set.seed(1)
 rcc_dgmm1 <- spatialDGMM(rcc_peaks2[16,], r=1, k=4, groups=1)
 
 summary(rcc_dgmm1)
@@ -160,6 +161,7 @@ image(rcc_dgmm1, layout=c(4,2))
 This is useful because we can use it to automatically detect segments to compare for statistical testing (e.g., "cancer" vs "normal" tissue). However, to do this without bias, we must make sure the segmentation is performed independently for each sample.
 
 ```{r dgmm}
+set.seed(1)
 rcc_dgmm <- spatialDGMM(rcc_peaks2, r=1, k=4, groups=rcc_peaks2$groups)
 
 summary(rcc_dgmm)
@@ -191,7 +193,7 @@ The summarized results are automatically adjusted for multiple comparisons using
 We can use the `topFeatures()` method to find differentially abundant peaks.
 
 ```{r top-mtest}
-topFeatures(mtest, p.adjust="fdr", AdjP < .05)
+topFeatures(mtest, p.adjust="fdr", AdjP < .1)
 ```
 
 But we don't find any.
@@ -221,7 +223,7 @@ summary(stest)
 Again, we can use the `topFeatures()` method to find differentially abundant peaks.
 
 ```{r stest-top}
-topFeatures(stest, p.adjust="fdr", AdjP < .05)
+topFeatures(stest, p.adjust="fdr", AdjP < .1)
 ```
 
 This time we find 2 differentially abundant peaks (though one is likely an isotope of the other).
